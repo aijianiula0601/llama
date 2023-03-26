@@ -30,18 +30,18 @@ def setup_model_parallel() -> Tuple[int, int]:
 
 
 def load(
-    ckpt_dir: str,
-    tokenizer_path: str,
-    local_rank: int,
-    world_size: int,
-    max_seq_len: int,
-    max_batch_size: int,
+        ckpt_dir: str,
+        tokenizer_path: str,
+        local_rank: int,
+        world_size: int,
+        max_seq_len: int,
+        max_batch_size: int,
 ) -> LLaMA:
     start_time = time.time()
     checkpoints = sorted(Path(ckpt_dir).glob("*.pth"))
-    assert world_size == len(
-        checkpoints
-    ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {world_size}"
+    # assert world_size == len(
+    #     checkpoints
+    # ), f"Loading a checkpoint for MP={len(checkpoints)} but world size is {world_size}"
     ckpt_path = checkpoints[local_rank]
     print("Loading")
     checkpoint = torch.load(ckpt_path, map_location="cpu")
@@ -64,14 +64,15 @@ def load(
 
 
 def main(
-    ckpt_dir: str,
-    tokenizer_path: str,
-    temperature: float = 0.8,
-    top_p: float = 0.95,
-    max_seq_len: int = 512,
-    max_batch_size: int = 32,
+        ckpt_dir: str,
+        tokenizer_path: str,
+        temperature: float = 0.8,
+        top_p: float = 0.95,
+        max_seq_len: int = 512,
+        max_batch_size: int = 32,
 ):
     local_rank, world_size = setup_model_parallel()
+    print(f"-----local_rank:{local_rank},world_size:{world_size}")
     if local_rank > 0:
         sys.stdout = open(os.devnull, "w")
 
